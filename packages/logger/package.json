@@ -1,0 +1,31 @@
+{
+  "name": "@relayflow/logger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pino-based structured logger for RelayFlow",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "dev": "tsc --project tsconfig.json --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "pino": "^9.1.0",
+    "pino-pretty": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5"
+  }
+}
