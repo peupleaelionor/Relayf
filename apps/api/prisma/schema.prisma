@@ -55,6 +55,7 @@ enum MessageStatus {
   PENDING
   QUEUED
   SENDING
+  SENT
   DELIVERED
   FAILED
   BOUNCED
