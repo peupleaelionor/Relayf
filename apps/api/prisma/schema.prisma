@@ -1,0 +1,790 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// RelayFlow Prisma Schema
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex", "views"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum WorkspaceStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+enum WorkspacePlan {
+  FREE
+  STARTER
+  GROWTH
+  SCALE
+  ENTERPRISE
+}
+
+enum MessageChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  TELEGRAM
+}
+
+enum MessageStatus {
+  PENDING
+  QUEUED
+  SENDING
+  DELIVERED
+  FAILED
+  BOUNCED
+  UNDELIVERED
+  READ
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  RUNNING
+  PAUSED
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum CampaignRecipientStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  SKIPPED
+  OPTED_OUT
+}
+
+enum TemplateStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum MessageEventType {
+  SENT
+  DELIVERED
+  FAILED
+  BOUNCED
+  OPENED
+  CLICKED
+  UNSUBSCRIBED
+  COMPLAINED
+  READ
+}
+
+enum ContactStatus {
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+  COMPLAINED
+  BLOCKED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELLED
+  UNPAID
+  INCOMPLETE
+}
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+enum WebhookEventType {
+  MESSAGE_SENT
+  MESSAGE_DELIVERED
+  MESSAGE_FAILED
+  MESSAGE_OPENED
+  MESSAGE_CLICKED
+  CONTACT_CREATED
+  CONTACT_UPDATED
+  CONTACT_OPTED_OUT
+  CAMPAIGN_STARTED
+  CAMPAIGN_COMPLETED
+  CAMPAIGN_FAILED
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_UPDATED
+  SUBSCRIPTION_CANCELLED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  API_KEY_CREATED
+  API_KEY_REVOKED
+  MEMBER_INVITED
+  MEMBER_REMOVED
+  CAMPAIGN_LAUNCHED
+  CAMPAIGN_CANCELLED
+  PLAN_CHANGED
+  BILLING_UPDATED
+}
+
+enum SenderIdentityStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+
+enum SenderIdentityType {
+  EMAIL
+  PHONE
+  WHATSAPP
+  TELEGRAM
+}
+
+enum ConsentChannel {
+  EMAIL
+  SMS
+  WHATSAPP
+  TELEGRAM
+}
+
+enum ConsentStatus {
+  OPTED_IN
+  OPTED_OUT
+  PENDING
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// User
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  emailVerified       Boolean   @default(false)
+  emailVerifiedAt     DateTime?
+  name                String
+  avatarUrl           String?
+  passwordHash        String
+  status              UserStatus @default(PENDING_VERIFICATION)
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+  totpSecret          String?
+  totpEnabled         Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  workspaceMembers    WorkspaceMember[]
+  auditLogs           AuditLog[]
+  createdApiKeys      APIKey[]         @relation("CreatedApiKeys")
+  sentInvites         Invite[]         @relation("SentInvites")
+
+  @@index([email])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Workspace
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Workspace {
+  id           String          @id @default(cuid())
+  name         String
+  slug         String          @unique
+  logoUrl      String?
+  status       WorkspaceStatus @default(ACTIVE)
+  plan         WorkspacePlan   @default(FREE)
+  timezone     String          @default("UTC")
+  locale       String          @default("en-US")
+  customDomain String?         @unique
+  settings     Json            @default("{}")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
+
+  members            WorkspaceMember[]
+  invites            Invite[]
+  apiKeys            APIKey[]
+  contacts           Contact[]
+  contactTags        ContactTag[]
+  templates          Template[]
+  campaigns          Campaign[]
+  messages           Message[]
+  providerAccounts   ProviderAccount[]
+  senderIdentities   SenderIdentity[]
+  billingCustomer    BillingCustomer?
+  subscription       Subscription?
+  usageRecords       UsageRecord[]
+  webhookEndpoints   WebhookEndpoint[]
+  webhookEvents      WebhookEvent[]
+  auditLogs          AuditLog[]
+  consentRecords     ConsentRecord[]
+  optOutRecords      OptOutRecord[]
+
+  @@index([slug])
+  @@index([deletedAt])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        UserRole  @default(MEMBER)
+  invitedBy   String?
+  joinedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+model Invite {
+  id          String    @id @default(cuid())
+  workspaceId String
+  email       String
+  role        UserRole  @default(MEMBER)
+  token       String    @unique @default(cuid())
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  invitedBy   String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  inviter     User      @relation("SentInvites", fields: [invitedBy], references: [id])
+
+  @@index([token])
+  @@index([workspaceId])
+  @@index([email])
+  @@map("invites")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// API Keys
+// ─────────────────────────────────────────────────────────────────────────────
+
+model APIKey {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  createdBy      String
+  name           String
+  keyHash        String    @unique
+  keyPrefix      String
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  scopes         String[]  @default([])
+  rateLimitRpm   Int       @default(60)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator        User      @relation("CreatedApiKeys", fields: [createdBy], references: [id])
+
+  @@index([workspaceId])
+  @@index([keyHash])
+  @@index([revokedAt])
+  @@map("api_keys")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contacts
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Contact {
+  id          String        @id @default(cuid())
+  workspaceId String
+  email       String?
+  phone       String?
+  telegramId  String?
+  firstName   String?
+  lastName    String?
+  status      ContactStatus @default(ACTIVE)
+  externalId  String?
+  attributes  Json          @default("{}")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+
+  workspace          Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tags               ContactTagMap[]
+  messages           Message[]
+  campaignRecipients CampaignRecipient[]
+  consentRecords     ConsentRecord[]
+  optOutRecords      OptOutRecord[]
+
+  @@unique([workspaceId, email])
+  @@unique([workspaceId, phone])
+  @@unique([workspaceId, externalId])
+  @@index([workspaceId])
+  @@index([email])
+  @@index([phone])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("contacts")
+}
+
+model ContactTag {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  color       String   @default("#6366f1")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contacts    ContactTagMap[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+  @@map("contact_tags")
+}
+
+model ContactTagMap {
+  contactId String
+  tagId     String
+
+  contact   Contact    @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tag       ContactTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, tagId])
+  @@index([contactId])
+  @@index([tagId])
+  @@map("contact_tag_maps")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Templates
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Template {
+  id          String         @id @default(cuid())
+  workspaceId String
+  name        String
+  channel     MessageChannel
+  status      TemplateStatus @default(DRAFT)
+  subject     String?
+  body        String
+  variables   String[]       @default([])
+  previewText String?
+  version     Int            @default(1)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  campaigns   Campaign[]
+
+  @@index([workspaceId])
+  @@index([channel])
+  @@index([status])
+  @@map("templates")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Campaigns
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Campaign {
+  id               String         @id @default(cuid())
+  workspaceId      String
+  name             String
+  channel          MessageChannel
+  status           CampaignStatus @default(DRAFT)
+  templateId       String?
+  subject          String?
+  body             String?
+  scheduledAt      DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  senderIdentityId String?
+  throttleRpm      Int?
+  totalRecipients  Int            @default(0)
+  sentCount        Int            @default(0)
+  deliveredCount   Int            @default(0)
+  failedCount      Int            @default(0)
+  openCount        Int            @default(0)
+  clickCount       Int            @default(0)
+  metadata         Json           @default("{}")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  workspace        Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  template         Template?          @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  senderIdentity   SenderIdentity?    @relation(fields: [senderIdentityId], references: [id], onDelete: SetNull)
+  recipients       CampaignRecipient[]
+  messages         Message[]
+
+  @@index([workspaceId])
+  @@index([status])
+  @@index([channel])
+  @@index([scheduledAt])
+  @@map("campaigns")
+}
+
+model CampaignRecipient {
+  id            String                  @id @default(cuid())
+  campaignId    String
+  contactId     String
+  status        CampaignRecipientStatus @default(PENDING)
+  messageId     String?
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  failureReason String?
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  contact       Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  message       Message? @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@unique([campaignId, contactId])
+  @@index([campaignId])
+  @@index([contactId])
+  @@index([status])
+  @@map("campaign_recipients")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Messages
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Message {
+  id                String         @id @default(cuid())
+  workspaceId       String
+  campaignId        String?
+  contactId         String?
+  channel           MessageChannel
+  status            MessageStatus  @default(PENDING)
+  to                String
+  from              String
+  subject           String?
+  body              String
+  providerMessageId String?
+  providerAccountId String?
+  cost              Decimal?       @db.Decimal(10, 6)
+  errorCode         String?
+  errorMessage      String?
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  metadata          Json           @default("{}")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  workspace          Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  campaign           Campaign?           @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  contact            Contact?            @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  providerAccount    ProviderAccount?    @relation(fields: [providerAccountId], references: [id], onDelete: SetNull)
+  events             MessageEvent[]
+  campaignRecipients CampaignRecipient[]
+
+  @@index([workspaceId])
+  @@index([campaignId])
+  @@index([contactId])
+  @@index([channel])
+  @@index([status])
+  @@index([sentAt])
+  @@index([providerMessageId])
+  @@map("messages")
+}
+
+model MessageEvent {
+  id          String           @id @default(cuid())
+  messageId   String
+  type        MessageEventType
+  occurredAt  DateTime         @default(now())
+  data        Json             @default("{}")
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime         @default(now())
+
+  message     Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([type])
+  @@index([occurredAt])
+  @@map("message_events")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Provider Accounts
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ProviderAccount {
+  id          String         @id @default(cuid())
+  workspaceId String
+  channel     MessageChannel
+  name        String
+  provider    String
+  credentials Json           @default("{}")
+  isDefault   Boolean        @default(false)
+  isActive    Boolean        @default(true)
+  metadata    Json           @default("{}")
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@index([workspaceId])
+  @@index([channel])
+  @@map("provider_accounts")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sender Identities
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SenderIdentity {
+  id          String               @id @default(cuid())
+  workspaceId String
+  type        SenderIdentityType
+  name        String
+  value       String
+  status      SenderIdentityStatus @default(PENDING)
+  isDefault   Boolean              @default(false)
+  verifiedAt  DateTime?
+  metadata    Json                 @default("{}")
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  campaigns   Campaign[]
+
+  @@unique([workspaceId, value])
+  @@index([workspaceId])
+  @@index([type])
+  @@map("sender_identities")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Billing
+// ─────────────────────────────────────────────────────────────────────────────
+
+model BillingCustomer {
+  id               String   @id @default(cuid())
+  workspaceId      String   @unique
+  stripeCustomerId String   @unique
+  email            String
+  name             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  workspace        Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@map("billing_customers")
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  workspaceId            String             @unique
+  stripeSubscriptionId   String             @unique
+  stripePriceId          String
+  status                 SubscriptionStatus @default(ACTIVE)
+  plan                   WorkspacePlan      @default(FREE)
+  interval               BillingInterval    @default(MONTHLY)
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  cancelAt               DateTime?
+  cancelledAt            DateTime?
+  trialStart             DateTime?
+  trialEnd               DateTime?
+  seats                  Int                @default(1)
+  metadata               Json               @default("{}")
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  workspace              Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  usageRecords           UsageRecord[]
+
+  @@index([stripeSubscriptionId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model UsageRecord {
+  id                 String         @id @default(cuid())
+  workspaceId        String
+  subscriptionId     String
+  channel            MessageChannel
+  quantity           Int            @default(0)
+  recordedAt         DateTime       @default(now())
+  billingPeriodStart DateTime
+  billingPeriodEnd   DateTime
+  createdAt          DateTime       @default(now())
+
+  workspace          Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  subscription       Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([subscriptionId])
+  @@index([billingPeriodStart, billingPeriodEnd])
+  @@map("usage_records")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Webhooks
+// ─────────────────────────────────────────────────────────────────────────────
+
+model WebhookEndpoint {
+  id                  String                @id @default(cuid())
+  workspaceId         String
+  url                 String
+  secret              String
+  events              WebhookEventType[]
+  isActive            Boolean               @default(true)
+  description         String?
+  failureCount        Int                   @default(0)
+  lastDeliveryAt      DateTime?
+  lastDeliveryStatus  WebhookDeliveryStatus?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  workspace           Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  webhookEvents       WebhookEvent[]
+
+  @@index([workspaceId])
+  @@map("webhook_endpoints")
+}
+
+model WebhookEvent {
+  id             String                @id @default(cuid())
+  workspaceId    String
+  endpointId     String
+  type           WebhookEventType
+  payload        Json
+  status         WebhookDeliveryStatus @default(PENDING)
+  attempts       Int                   @default(0)
+  nextRetryAt    DateTime?
+  deliveredAt    DateTime?
+  responseCode   Int?
+  responseBody   String?
+  errorMessage   String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  endpoint       WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([endpointId])
+  @@index([status])
+  @@index([nextRetryAt])
+  @@map("webhook_events")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Compliance
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ConsentRecord {
+  id          String        @id @default(cuid())
+  workspaceId String
+  contactId   String
+  channel     ConsentChannel
+  status      ConsentStatus  @default(PENDING)
+  consentedAt DateTime?
+  revokedAt   DateTime?
+  ipAddress   String?
+  userAgent   String?
+  source      String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contact     Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, contactId, channel])
+  @@index([workspaceId])
+  @@index([contactId])
+  @@map("consent_records")
+}
+
+model OptOutRecord {
+  id          String         @id @default(cuid())
+  workspaceId String
+  contactId   String
+  channel     MessageChannel
+  reason      String?
+  optedOutAt  DateTime       @default(now())
+  ipAddress   String?
+  createdAt   DateTime       @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contact     Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, contactId, channel])
+  @@index([workspaceId])
+  @@index([contactId])
+  @@map("opt_out_records")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Audit Log
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id          String       @id @default(cuid())
+  workspaceId String
+  userId      String?
+  action      AuditAction
+  resource    String
+  resourceId  String?
+  changes     Json?
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json         @default("{}")
+  createdAt   DateTime     @default(now())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([action])
+  @@index([resource, resourceId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

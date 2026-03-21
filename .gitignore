@@ -1,0 +1,99 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+*.d.ts.map
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+!.env.example
+
+# Prisma
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.history/
+
+# Coverage
+coverage/
+.nyc_output/
+lcov.info
+
+# Testing
+test-results/
+playwright-report/
+.playwright/
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
+.lock-wscript
+jspm_packages/
+typings/
+.npmrc.local
+
+# Vercel
+.vercel
+
+# Fly.io
+.fly/
+
+# Docker
+.dockerignore
+
+# pnpm
+.pnpm-store/

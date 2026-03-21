@@ -1,0 +1,34 @@
+{
+  "name": "@relayflow/sdk",
+  "version": "0.1.0",
+  "private": false,
+  "description": "TypeScript SDK for RelayFlow API",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "dev": "tsc --project tsconfig.json --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rimraf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@relayflow/types": "workspace:*",
+    "cross-fetch": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5"
+  },
+  "keywords": ["relayflow", "sdk", "messaging", "sms", "email", "whatsapp"],
+  "license": "MIT"
+}
