@@ -18,7 +18,7 @@
     "db:migrate": "turbo run db:migrate",
     "db:seed": "turbo run db:seed",
     "db:studio": "cd apps/api && pnpm prisma studio",
-    "prepare": "husky install"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
