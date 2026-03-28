@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RelayFlow – Plateforme de messagerie multi-canal</title>
+  <meta name="description" content="RelayFlow – Plateforme SaaS de messagerie multi-canal : SMS, Email, WhatsApp, Telegram." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--primary:#3b82f6;--primary-hover:#2563eb;--accent:#06b6d4;--text:#f1f5f9;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+    a{color:var(--primary);text-decoration:none;transition:color .2s}
+    a:hover{color:var(--primary-hover)}
+    .container{max-width:960px;margin:0 auto;padding:0 1.5rem}
+
+    /* ── Hero ───────────────────────────────────────── */
+    .hero{text-align:center;padding:5rem 1.5rem 3rem}
+    .hero__logo{font-size:3.5rem;margin-bottom:.5rem}
+    .hero__title{font-size:2.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
+    .hero__title span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero__sub{font-size:1.125rem;color:var(--muted);max-width:540px;margin:0 auto 2rem}
+    .hero__actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:.5rem;font-weight:600;font-size:.95rem;border:none;cursor:pointer;transition:all .2s}
+    .btn--primary{background:var(--primary);color:#fff}
+    .btn--primary:hover{background:var(--primary-hover);color:#fff}
+    .btn--outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn--outline:hover{border-color:var(--primary);color:var(--primary)}
+
+    /* ── Status Banner ──────────────────────────────── */
+    .status{margin:2rem auto;max-width:480px;background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.95rem}
+    .status__dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+    .status__dot--ok{background:var(--green)}
+    .status__dot--err{background:var(--red)}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .status__text{color:var(--muted)}
+    .status__text strong{color:var(--text)}
+
+    /* ── Features ───────────────────────────────────── */
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;padding:3rem 0}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;transition:border-color .2s}
+    .card:hover{border-color:var(--primary)}
+    .card__icon{font-size:1.75rem;margin-bottom:.75rem}
+    .card__title{font-size:1.1rem;font-weight:700;margin-bottom:.375rem}
+    .card__desc{font-size:.9rem;color:var(--muted)}
+
+    /* ── Endpoints ──────────────────────────────────── */
+    .endpoints{padding:2rem 0 3rem}
+    .endpoints h2{font-size:1.5rem;margin-bottom:1.25rem}
+    .endpoint{background:var(--surface);border:1px solid var(--border);border-radius:.5rem;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem;font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:.875rem}
+    .method{font-weight:700;min-width:3.5rem;text-align:center;padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;text-transform:uppercase}
+    .method--get{color:#22c55e;background:#22c55e1a}
+    .method--post{color:#3b82f6;background:#3b82f61a}
+    .method--patch{color:#f59e0b;background:#f59e0b1a}
+    .method--delete{color:#ef4444;background:#ef44441a}
+    .path{color:var(--muted)}
+
+    /* ── Footer ─────────────────────────────────────── */
+    footer{text-align:center;padding:2rem 1.5rem 3rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+    footer a{color:var(--accent)}
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media(max-width:600px){
+      .hero__title{font-size:1.75rem}
+      .hero__sub{font-size:1rem}
+      .hero{padding:3rem 1rem 2rem}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__logo">📡</div>
+    <h1 class="hero__title"><span>RelayFlow</span></h1>
+    <p class="hero__sub">
+      Plateforme SaaS de messagerie multi-canal de qualité production.
+      Envoyez des SMS, emails, WhatsApp &amp; Telegram via une seule API.
+    </p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="/api/docs">📖 Documentation API</a>
+      <a class="btn btn--outline" href="/health">❤️ Vérifier le statut</a>
+    </div>
+  </section>
+
+  <!-- Live Status -->
+  <div class="status" id="status-banner">
+    <span class="status__dot status__dot--ok" id="status-dot"></span>
+    <span class="status__text" id="status-text">Vérification du statut…</span>
+  </div>
+
+  <!-- Features -->
+  <div class="container">
+    <div class="features">
+      <div class="card">
+        <div class="card__icon">📱</div>
+        <div class="card__title">Multi-Canal</div>
+        <div class="card__desc">SMS, Email, WhatsApp et Telegram – un seul point d'intégration pour tous vos canaux.</div>
+      </div>
+      <div class="card">
+        <div class="card__icon">🚀</div>
+        <div class="card__title">Campagnes</div>
+        <div class="card__desc">Créez et lancez des campagnes avec templates personnalisés et suivi en temps réel.</div>
+      </div>
+      <div class="card">
+        <div class="card__icon">🔑</div>
+        <div class="card__title">Authentification</div>
+        <div class="card__desc">JWT + clés API avec scopes, rate limiting et gestion multi-workspace.</div>
+      </div>
+      <div class="card">
+        <div class="card__icon">📊</div>
+        <div class="card__title">Analytics</div>
+        <div class="card__desc">Tableaux de bord détaillés, taux de livraison, ouvertures et webhooks en temps réel.</div>
+      </div>
+      <div class="card">
+        <div class="card__icon">💳</div>
+        <div class="card__title">Facturation</div>
+        <div class="card__desc">Intégration Stripe complète avec plans Free, Starter, Growth, Scale et Enterprise.</div>
+      </div>
+      <div class="card">
+        <div class="card__icon">🔒</div>
+        <div class="card__title">Sécurité</div>
+        <div class="card__desc">Helmet, throttling, validation Zod, chiffrement et journaux d'audit complets.</div>
+      </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <section class="endpoints">
+      <h2>Principaux Endpoints</h2>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/health</span></div>
+      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/auth/register</span></div>
+      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/auth/login</span></div>
+      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/messages/send</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/messages</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/contacts</span></div>
+      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/contacts</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/campaigns</span></div>
+      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/campaigns</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/templates</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/webhooks</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/analytics</span></div>
+      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/api/docs</span></div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>RelayFlow v0.1.0 &copy; 2024 – Déployé sur <a href="https://www.netlify.com" target="_blank" rel="noopener">Netlify</a></p>
+  </footer>
+
+  <script>
+    (async function checkHealth() {
+      const dot  = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      try {
+        const res  = await fetch('/health', { signal: AbortSignal.timeout(5000) });
+        const data = await res.json();
+        if (data && data.status === 'ok') {
+          dot.className  = 'status__dot status__dot--ok';
+          text.innerHTML = '<strong>API opérationnelle</strong> – ' + data.timestamp;
+        } else {
+          throw new Error('unhealthy');
+        }
+      } catch {
+        dot.className  = 'status__dot status__dot--err';
+        text.innerHTML = '<strong>API hors ligne</strong> – La fonction serverless n\'est pas configurée ou les variables d\'environnement manquent.';
+      }
+    })();
+  </script>
+</body>
+</html>

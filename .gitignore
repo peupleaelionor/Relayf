@@ -89,6 +89,9 @@ typings/
 # Vercel
 .vercel
 
+# Netlify
+.netlify
+
 # Fly.io
 .fly/
 
