@@ -3,168 +3,1204 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RelayFlow – Plateforme de messagerie multi-canal</title>
-  <meta name="description" content="RelayFlow – Plateforme SaaS de messagerie multi-canal : SMS, Email, WhatsApp, Telegram." />
+  <title>RelayFlow - Plateforme de messagerie multi-canal</title>
+  <meta name="description" content="RelayFlow - Plateforme SaaS de messagerie multi-canal : SMS, Email, WhatsApp, Telegram. API unifiée haute performance." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--primary:#3b82f6;--primary-hover:#2563eb;--accent:#06b6d4;--text:#f1f5f9;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-    html{scroll-behavior:smooth}
-    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
-    a{color:var(--primary);text-decoration:none;transition:color .2s}
-    a:hover{color:var(--primary-hover)}
-    .container{max-width:960px;margin:0 auto;padding:0 1.5rem}
+    /* ── CSS Variables ─────────────────────────────────── */
+    :root {
+      --bg: #050a18;
+      --bg-alt: #0a1128;
+      --surface: rgba(15, 23, 42, 0.6);
+      --glass: rgba(255,255,255,0.03);
+      --glass-border: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-dark: #4f46e5;
+      --accent: #06b6d4;
+      --accent-light: #22d3ee;
+      --purple: #a855f7;
+      --pink: #ec4899;
+      --text: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --muted: #64748b;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+    }
 
-    /* ── Hero ───────────────────────────────────────── */
-    .hero{text-align:center;padding:5rem 1.5rem 3rem}
-    .hero__logo{font-size:3.5rem;margin-bottom:.5rem}
-    .hero__title{font-size:2.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
-    .hero__title span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero__sub{font-size:1.125rem;color:var(--muted);max-width:540px;margin:0 auto 2rem}
-    .hero__actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:.5rem;font-weight:600;font-size:.95rem;border:none;cursor:pointer;transition:all .2s}
-    .btn--primary{background:var(--primary);color:#fff}
-    .btn--primary:hover{background:var(--primary-hover);color:#fff}
-    .btn--outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-    .btn--outline:hover{border-color:var(--primary);color:var(--primary)}
+    /* ── Reset & Base ──────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
 
-    /* ── Status Banner ──────────────────────────────── */
-    .status{margin:2rem auto;max-width:480px;background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.95rem}
-    .status__dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
-    .status__dot--ok{background:var(--green)}
-    .status__dot--err{background:var(--red)}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    .status__text{color:var(--muted)}
-    .status__text strong{color:var(--text)}
+    /* ── Animated Background ──────────────────────────── */
+    .mesh-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(99,102,241,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(6,182,212,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 10%, rgba(168,85,247,0.08) 0%, transparent 60%);
+      animation: meshMove 20s ease-in-out infinite alternate;
+    }
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent);
+    }
 
-    /* ── Features ───────────────────────────────────── */
-    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;padding:3rem 0}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:1.5rem;transition:border-color .2s}
-    .card:hover{border-color:var(--primary)}
-    .card__icon{font-size:1.75rem;margin-bottom:.75rem}
-    .card__title{font-size:1.1rem;font-weight:700;margin-bottom:.375rem}
-    .card__desc{font-size:.9rem;color:var(--muted)}
+    @keyframes meshMove {
+      0%   { transform: scale(1)   translate(0, 0); }
+      50%  { transform: scale(1.05) translate(-20px, 15px); }
+      100% { transform: scale(1)   translate(10px, -10px); }
+    }
 
-    /* ── Endpoints ──────────────────────────────────── */
-    .endpoints{padding:2rem 0 3rem}
-    .endpoints h2{font-size:1.5rem;margin-bottom:1.25rem}
-    .endpoint{background:var(--surface);border:1px solid var(--border);border-radius:.5rem;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem;font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:.875rem}
-    .method{font-weight:700;min-width:3.5rem;text-align:center;padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;text-transform:uppercase}
-    .method--get{color:#22c55e;background:#22c55e1a}
-    .method--post{color:#3b82f6;background:#3b82f61a}
-    .method--patch{color:#f59e0b;background:#f59e0b1a}
-    .method--delete{color:#ef4444;background:#ef44441a}
-    .path{color:var(--muted)}
+    /* ── Layout Utilities ─────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 100px 0; }
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary-light);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header .section-desc { margin-left: auto; margin-right: auto; }
 
-    /* ── Footer ─────────────────────────────────────── */
-    footer{text-align:center;padding:2rem 1.5rem 3rem;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
-    footer a{color:var(--accent)}
+    /* ── Glass Card ────────────────────────────────────── */
+    .glass-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
 
-    /* ── Responsive ─────────────────────────────────── */
-    @media(max-width:600px){
-      .hero__title{font-size:1.75rem}
-      .hero__sub{font-size:1rem}
-      .hero{padding:3rem 1rem 2rem}
+    /* ── Buttons ───────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(99,102,241,0.5);
+    }
+    .btn-ghost {
+      background: var(--glass);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--primary);
+      color: var(--text);
+      background: rgba(99,102,241,0.08);
+    }
+
+    /* ── Reveal Animations ────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Navigation ────────────────────────────────────── */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 16px 0;
+      transition: all 0.35s ease;
+    }
+    .navbar.scrolled {
+      padding: 10px 0;
+      background: rgba(5,10,24,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+    .nav-brand span { color: var(--primary-light); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.25s ease;
+      position: relative;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 1px;
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--radius-xs);
+      transition: all 0.3s ease;
+    }
+    .nav-cta:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 4px 16px rgba(99,102,241,0.4);
+    }
+    .nav-cta svg { width: 16px; height: 16px; }
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-secondary);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    /* ── Hero ──────────────────────────────────────────── */
+    .hero {
+      padding: 160px 0 80px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary-light);
+      margin-bottom: 24px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--primary-light);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-light), var(--purple));
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 6s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Code Preview ─────────────────────────────────── */
+    .code-window {
+      background: rgba(10,17,40,0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+    .code-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .code-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .code-dot.red   { background: #ef4444; }
+    .code-dot.amber { background: #f59e0b; }
+    .code-dot.green { background: #22c55e; }
+    .code-titlebar span {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .code-body {
+      padding: 20px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.82rem;
+      line-height: 1.85;
+      overflow-x: auto;
+    }
+    .code-body code { white-space: pre; }
+    .hl-kw   { color: var(--purple); }
+    .hl-fn   { color: var(--accent-light); }
+    .hl-str  { color: var(--green); }
+    .hl-cm   { color: var(--muted); font-style: italic; }
+    .hl-num  { color: var(--amber); }
+    .hl-prop { color: var(--pink); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* ── Status Banner ────────────────────────────────── */
+    .status-banner {
+      display: flex;
+      justify-content: center;
+      padding: 0 24px 60px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      animation: pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .status-dot.online  { background: var(--green); }
+    .status-dot.offline { background: var(--red); }
+
+    /* ── Stats Section ────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .stat-card {
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+    .stat-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── Features Section ─────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+    }
+    .feature-icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+    .feature-icon.blue   { background: rgba(59,130,246,0.12); }
+    .feature-icon.purple { background: rgba(168,85,247,0.12); }
+    .feature-icon.cyan   { background: rgba(6,182,212,0.12); }
+    .feature-icon.green  { background: rgba(34,197,94,0.12); }
+    .feature-icon.pink   { background: rgba(236,72,153,0.12); }
+    .feature-icon.amber  { background: rgba(245,158,11,0.12); }
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ── API Section ──────────────────────────────────── */
+    .api-section .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+    .api-info { padding-top: 20px; }
+    .channel-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 28px 0 36px;
+    }
+    .channel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .terminal-window {
+      background: rgba(10,17,40,0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .terminal-header .dots { display: flex; gap: 6px; }
+    .terminal-header .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .terminal-header .dot.r { background: #ef4444; }
+    .terminal-header .dot.a { background: #f59e0b; }
+    .terminal-header .dot.g { background: #22c55e; }
+    .terminal-header span {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .terminal-body { padding: 8px 0; }
+    .endpoint-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 18px;
+      font-size: 0.8rem;
+      transition: background 0.2s ease;
+    }
+    .endpoint-row:hover { background: rgba(255,255,255,0.03); }
+    .method-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      padding: 3px 0;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+    .method-badge.get  { background: rgba(34,197,94,0.15); color: var(--green); }
+    .method-badge.post { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .endpoint-path {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .endpoint-desc {
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-left: auto;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ── Pricing Section ──────────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .pricing-card {
+      padding: 36px 32px;
+      position: relative;
+    }
+    .pricing-card.featured {
+      border-color: rgba(99,102,241,0.3);
+      background: linear-gradient(160deg, rgba(99,102,241,0.08), var(--glass));
+      box-shadow: 0 0 60px rgba(99,102,241,0.1);
+    }
+    .pricing-popular {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 16px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .pricing-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .pricing-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .pricing-price {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.03em;
+    }
+    .pricing-price .period {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .pricing-features {
+      margin: 24px 0 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .pricing-card .btn { width: 100%; justify-content: center; }
+
+    /* ── CTA Section ──────────────────────────────────── */
+    .cta-section {
+      padding: 80px 0;
+    }
+    .cta-box {
+      text-align: center;
+      padding: 64px 40px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(6,182,212,0.08));
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .cta-box h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+    .cta-box p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      margin-bottom: 32px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-box .btn-group {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Footer ────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 64px 0 0;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 48px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      margin-bottom: 14px;
+    }
+    .footer-brand span { color: var(--primary-light); }
+    .footer-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 280px;
+    }
+    .footer-col h4 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+    }
+    .footer-col a {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--muted);
+      padding: 5px 0;
+      transition: color 0.25s ease;
+    }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-bottom small {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .footer-socials {
+      display: flex;
+      gap: 16px;
+    }
+    .footer-socials a {
+      color: var(--muted);
+      transition: color 0.25s ease;
+    }
+    .footer-socials a:hover { color: var(--text); }
+    .footer-socials svg { width: 20px; height: 20px; }
+
+    /* ── Responsive ────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-card:last-child { grid-column: span 2; }
+      .api-section .container { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .section { padding: 72px 0; }
+      .features-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-card:last-child { grid-column: span 1; }
+      .hero .container { grid-template-columns: 1fr; }
+      .hero { padding: 120px 0 60px; min-height: auto; }
+      .code-window { max-width: 100%; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(5,10,24,0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 24px;
+        border-bottom: 1px solid var(--border);
+        gap: 16px;
+      }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .endpoint-desc { display: none; }
+    }
+    @media (max-width: 480px) {
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn { width: 100%; justify-content: center; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
     }
   </style>
 </head>
 <body>
+  <!-- Animated Background -->
+  <div class="mesh-bg" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
 
-  <!-- Hero -->
+  <!-- ── Navigation ──────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="/" class="nav-brand">📡 Relay<span>Flow</span></a>
+      <div class="nav-links" id="navLinks">
+        <a href="#features">Fonctionnalités</a>
+        <a href="#api">API</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="/api/docs" class="nav-cta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          Documentation
+        </a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Hero Section ────────────────────────────────── -->
   <section class="hero">
-    <div class="hero__logo">📡</div>
-    <h1 class="hero__title"><span>RelayFlow</span></h1>
-    <p class="hero__sub">
-      Plateforme SaaS de messagerie multi-canal de qualité production.
-      Envoyez des SMS, emails, WhatsApp &amp; Telegram via une seule API.
-    </p>
-    <div class="hero__actions">
-      <a class="btn btn--primary" href="/api/docs">📖 Documentation API</a>
-      <a class="btn btn--outline" href="/health">❤️ Vérifier le statut</a>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">v0.1.0 — Maintenant disponible</div>
+        <h1 class="hero-title">
+          Messagerie multi-canal<br>
+          <span class="gradient-text">simplifiée pour les devs</span>
+        </h1>
+        <p class="hero-subtitle">
+          Une API unique pour envoyer des SMS, emails, WhatsApp et Telegram.
+          Intégration en 5 minutes, scalabilité infinie.
+        </p>
+        <div class="hero-actions">
+          <a href="/api/docs" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"></path></svg>
+            Documentation API
+          </a>
+          <a href="#api" class="btn btn-ghost">
+            Explorer l'API
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Code Preview -->
+      <div class="code-window">
+        <div class="code-titlebar">
+          <div class="code-dot red"></div>
+          <div class="code-dot amber"></div>
+          <div class="code-dot green"></div>
+          <span>send-message.js</span>
+        </div>
+        <div class="code-body">
+<code><span class="hl-cm">// Envoyer un message multi-canal</span>
+<span class="hl-kw">const</span> response = <span class="hl-kw">await</span> <span class="hl-fn">fetch</span>(<span class="hl-str">'/api/messages/send'</span>, {
+  <span class="hl-prop">method</span>: <span class="hl-str">'POST'</span>,
+  <span class="hl-prop">headers</span>: {
+    <span class="hl-str">'Content-Type'</span>: <span class="hl-str">'application/json'</span>,
+    <span class="hl-str">'Authorization'</span>: <span class="hl-str">'Bearer &lt;token&gt;'</span>
+  },
+  <span class="hl-prop">body</span>: <span class="hl-fn">JSON.stringify</span>({
+    <span class="hl-prop">channel</span>: <span class="hl-str">'whatsapp'</span>,
+    <span class="hl-prop">to</span>: <span class="hl-str">'+33612345678'</span>,
+    <span class="hl-prop">message</span>: <span class="hl-str">'Bonjour depuis RelayFlow! 🚀'</span>
+  })
+});
+
+<span class="hl-kw">const</span> data = <span class="hl-kw">await</span> response.<span class="hl-fn">json</span>();
+<span class="hl-cm">// → { success: true, messageId: "msg_9x7..." }</span></code>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- Live Status -->
-  <div class="status" id="status-banner">
-    <span class="status__dot status__dot--ok" id="status-dot"></span>
-    <span class="status__text" id="status-text">Vérification du statut…</span>
+  <!-- ── Status Banner ───────────────────────────────── -->
+  <div class="status-banner reveal">
+    <div class="status-pill" id="statusPill">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Vérification du statut…</span>
+    </div>
   </div>
 
-  <!-- Features -->
-  <div class="container">
-    <div class="features">
-      <div class="card">
-        <div class="card__icon">📱</div>
-        <div class="card__title">Multi-Canal</div>
-        <div class="card__desc">SMS, Email, WhatsApp et Telegram – un seul point d'intégration pour tous vos canaux.</div>
-      </div>
-      <div class="card">
-        <div class="card__icon">🚀</div>
-        <div class="card__title">Campagnes</div>
-        <div class="card__desc">Créez et lancez des campagnes avec templates personnalisés et suivi en temps réel.</div>
-      </div>
-      <div class="card">
-        <div class="card__icon">🔑</div>
-        <div class="card__title">Authentification</div>
-        <div class="card__desc">JWT + clés API avec scopes, rate limiting et gestion multi-workspace.</div>
-      </div>
-      <div class="card">
-        <div class="card__icon">📊</div>
-        <div class="card__title">Analytics</div>
-        <div class="card__desc">Tableaux de bord détaillés, taux de livraison, ouvertures et webhooks en temps réel.</div>
-      </div>
-      <div class="card">
-        <div class="card__icon">💳</div>
-        <div class="card__title">Facturation</div>
-        <div class="card__desc">Intégration Stripe complète avec plans Free, Starter, Growth, Scale et Enterprise.</div>
-      </div>
-      <div class="card">
-        <div class="card__icon">🔒</div>
-        <div class="card__title">Sécurité</div>
-        <div class="card__desc">Helmet, throttling, validation Zod, chiffrement et journaux d'audit complets.</div>
+  <!-- ── Stats Section ───────────────────────────────── -->
+  <section class="section reveal">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="glass-card stat-card">
+          <div class="stat-value" data-target="5" data-suffix="">5</div>
+          <div class="stat-label">Canaux supportés</div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-value" data-target="99.9" data-suffix="%" data-decimal="1">99.9%</div>
+          <div class="stat-label">Uptime garanti</div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-value" data-target="200" data-prefix="<" data-suffix="ms">&lt;200ms</div>
+          <div class="stat-label">Latence moyenne</div>
+        </div>
+        <div class="glass-card stat-card">
+          <div class="stat-value">∞</div>
+          <div class="stat-label">Scalabilité</div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- API Endpoints -->
-    <section class="endpoints">
-      <h2>Principaux Endpoints</h2>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/health</span></div>
-      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/auth/register</span></div>
-      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/auth/login</span></div>
-      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/messages/send</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/messages</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/contacts</span></div>
-      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/contacts</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/campaigns</span></div>
-      <div class="endpoint"><span class="method method--post">POST</span><span class="path">/campaigns</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/templates</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/webhooks</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/analytics</span></div>
-      <div class="endpoint"><span class="method method--get">GET</span><span class="path">/api/docs</span></div>
-    </section>
-  </div>
+  <!-- ── Features Section ────────────────────────────── -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">🚀 Fonctionnalités</div>
+        <h2 class="section-title">Tout ce qu'il faut pour vos messages</h2>
+        <p class="section-desc">
+          Une plateforme complète pour gérer tous vos canaux de communication depuis une seule API.
+        </p>
+      </div>
+      <div class="features-grid">
+        <div class="glass-card feature-card reveal">
+          <div class="feature-icon blue">📱</div>
+          <h3>Multi-Canal Unifié</h3>
+          <p>SMS, Email, WhatsApp, Telegram — un seul endpoint pour tous vos canaux de messagerie.</p>
+        </div>
+        <div class="glass-card feature-card reveal">
+          <div class="feature-icon purple">🚀</div>
+          <h3>Campagnes Intelligentes</h3>
+          <p>Créez et planifiez des campagnes multi-canal avec segmentation avancée et A/B testing.</p>
+        </div>
+        <div class="glass-card feature-card reveal">
+          <div class="feature-icon cyan">🔑</div>
+          <h3>Auth &amp; Sécurité</h3>
+          <p>Authentification JWT, clés API rotatives, rate limiting et permissions granulaires.</p>
+        </div>
+        <div class="glass-card feature-card reveal">
+          <div class="feature-icon green">📊</div>
+          <h3>Analytics Avancés</h3>
+          <p>Tableaux de bord temps réel, taux de délivrabilité, engagement et rapports détaillés.</p>
+        </div>
+        <div class="glass-card feature-card reveal">
+          <div class="feature-icon pink">💳</div>
+          <h3>Facturation Stripe</h3>
+          <p>Intégration Stripe native avec abonnements, usage metering et facturation automatique.</p>
+        </div>
+        <div class="glass-card feature-card reveal">
+          <div class="feature-icon amber">🔒</div>
+          <h3>Sécurité Maximale</h3>
+          <p>Chiffrement AES-256, conformité RGPD, audit logs et isolation des données par tenant.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- Footer -->
-  <footer>
-    <p>RelayFlow v0.1.0 &copy; 2024 – Déployé sur <a href="https://www.netlify.com" target="_blank" rel="noopener">Netlify</a></p>
+  <!-- ── API Section ─────────────────────────────────── -->
+  <section class="section api-section" id="api">
+    <div class="container">
+      <div class="api-info reveal">
+        <div class="section-label">⚡ API REST</div>
+        <h2 class="section-title">Une API pensée<br>pour les développeurs</h2>
+        <p class="section-desc">
+          Des endpoints intuitifs, une documentation complète et des SDKs dans vos langages favoris.
+        </p>
+        <div class="channel-badges">
+          <span class="channel-badge">📱 SMS</span>
+          <span class="channel-badge">📧 Email</span>
+          <span class="channel-badge">💬 WhatsApp</span>
+          <span class="channel-badge">✈️ Telegram</span>
+          <span class="channel-badge">🔔 Webhooks</span>
+        </div>
+        <a href="/api/docs" class="btn btn-primary">
+          Voir la documentation
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+
+      <div class="terminal-window reveal">
+        <div class="terminal-header">
+          <div class="dots">
+            <div class="dot r"></div>
+            <div class="dot a"></div>
+            <div class="dot g"></div>
+          </div>
+          <span>API Endpoints — RelayFlow v0.1.0</span>
+        </div>
+        <div class="terminal-body">
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/health</span><span class="endpoint-desc">Vérification de santé</span></div>
+          <div class="endpoint-row"><span class="method-badge post">POST</span><span class="endpoint-path">/auth/register</span><span class="endpoint-desc">Inscription utilisateur</span></div>
+          <div class="endpoint-row"><span class="method-badge post">POST</span><span class="endpoint-path">/auth/login</span><span class="endpoint-desc">Connexion &amp; token JWT</span></div>
+          <div class="endpoint-row"><span class="method-badge post">POST</span><span class="endpoint-path">/messages/send</span><span class="endpoint-desc">Envoi de message</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/messages</span><span class="endpoint-desc">Liste des messages</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/contacts</span><span class="endpoint-desc">Liste des contacts</span></div>
+          <div class="endpoint-row"><span class="method-badge post">POST</span><span class="endpoint-path">/contacts</span><span class="endpoint-desc">Créer un contact</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/campaigns</span><span class="endpoint-desc">Liste des campagnes</span></div>
+          <div class="endpoint-row"><span class="method-badge post">POST</span><span class="endpoint-path">/campaigns</span><span class="endpoint-desc">Créer une campagne</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/templates</span><span class="endpoint-desc">Modèles de message</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/webhooks</span><span class="endpoint-desc">Webhooks configurés</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/analytics</span><span class="endpoint-desc">Données analytiques</span></div>
+          <div class="endpoint-row"><span class="method-badge get">GET</span><span class="endpoint-path">/api/docs</span><span class="endpoint-desc">Documentation Swagger</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Pricing Section ─────────────────────────────── -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-label">💎 Tarifs</div>
+        <h2 class="section-title">Des prix simples et transparents</h2>
+        <p class="section-desc">
+          Commencez gratuitement, évoluez à votre rythme. Sans engagement, sans surprise.
+        </p>
+      </div>
+      <div class="pricing-grid">
+        <!-- Starter -->
+        <div class="glass-card pricing-card reveal">
+          <div class="pricing-name">Starter</div>
+          <div class="pricing-desc">Pour découvrir la plateforme</div>
+          <div class="pricing-price">Gratuit</div>
+          <ul class="pricing-features">
+            <li>100 messages / mois</li>
+            <li>2 canaux (SMS, Email)</li>
+            <li>API REST complète</li>
+            <li>Support communautaire</li>
+          </ul>
+          <a href="/auth/register" class="btn btn-ghost">Commencer gratuitement</a>
+        </div>
+        <!-- Growth (featured) -->
+        <div class="glass-card pricing-card featured reveal">
+          <div class="pricing-popular">Populaire</div>
+          <div class="pricing-name">Growth</div>
+          <div class="pricing-desc">Pour les équipes en croissance</div>
+          <div class="pricing-price">49€ <span class="period">/ mois</span></div>
+          <ul class="pricing-features">
+            <li>10 000 messages / mois</li>
+            <li>5 canaux complets</li>
+            <li>Campagnes &amp; templates</li>
+            <li>Analytics avancés</li>
+            <li>Support prioritaire</li>
+          </ul>
+          <a href="/auth/register" class="btn btn-primary">Démarrer l'essai gratuit</a>
+        </div>
+        <!-- Enterprise -->
+        <div class="glass-card pricing-card reveal">
+          <div class="pricing-name">Enterprise</div>
+          <div class="pricing-desc">Pour les grandes organisations</div>
+          <div class="pricing-price">Sur mesure</div>
+          <ul class="pricing-features">
+            <li>Messages illimités</li>
+            <li>Tous les canaux</li>
+            <li>SLA garanti 99.99%</li>
+            <li>Account manager dédié</li>
+            <li>Intégrations sur mesure</li>
+          </ul>
+          <a href="mailto:contact@relayflow.dev" class="btn btn-ghost">Contacter les ventes</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA Section ─────────────────────────────────── -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box reveal">
+        <h2>Prêt à simplifier votre messagerie ?</h2>
+        <p>Rejoignez les développeurs qui utilisent RelayFlow pour envoyer des millions de messages chaque jour.</p>
+        <div class="btn-group">
+          <a href="/auth/register" class="btn btn-primary">
+            Créer un compte gratuit
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </a>
+          <a href="/api/docs" class="btn btn-ghost">Voir la documentation</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">📡 Relay<span>Flow</span></div>
+          <p class="footer-desc">
+            Plateforme de messagerie multi-canal pour les développeurs modernes. API unifiée, performance maximale.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Produit</h4>
+          <a href="#features">Fonctionnalités</a>
+          <a href="#api">API</a>
+          <a href="#pricing">Tarifs</a>
+          <a href="/api/docs">Documentation</a>
+        </div>
+        <div class="footer-col">
+          <h4>Ressources</h4>
+          <a href="/api/docs">Guide de démarrage</a>
+          <a href="/api/docs">Référence API</a>
+          <a href="#">Statut système</a>
+          <a href="#">Changelog</a>
+        </div>
+        <div class="footer-col">
+          <h4>Légal</h4>
+          <a href="#">Politique de confidentialité</a>
+          <a href="#">Conditions d'utilisation</a>
+          <a href="#">RGPD</a>
+          <a href="#">Mentions légales</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <small>&copy; 2025 RelayFlow. Tous droits réservés.</small>
+        <div class="footer-socials">
+          <a href="https://github.com" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+          <a href="https://twitter.com" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
   </footer>
 
+  <!-- ── JavaScript ──────────────────────────────────── -->
   <script>
-    (async function checkHealth() {
-      const dot  = document.getElementById('status-dot');
-      const text = document.getElementById('status-text');
-      try {
-        const res  = await fetch('/health', { signal: AbortSignal.timeout(5000) });
-        const data = await res.json();
-        if (data && data.status === 'ok') {
-          dot.className  = 'status__dot status__dot--ok';
-          text.innerHTML = '<strong>API opérationnelle</strong> – ' + data.timestamp;
+    (function () {
+      'use strict';
+
+      // ── IntersectionObserver for .reveal elements ──
+      var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(function (el) {
+        revealObserver.observe(el);
+      });
+
+      // ── Navbar scroll detection ──
+      var navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 40) {
+          navbar.classList.add('scrolled');
         } else {
-          throw new Error('unhealthy');
+          navbar.classList.remove('scrolled');
         }
-      } catch {
-        dot.className  = 'status__dot status__dot--err';
-        text.innerHTML = '<strong>API hors ligne</strong> – La fonction serverless n\'est pas configurée ou les variables d\'environnement manquent.';
+      }, { passive: true });
+
+      // ── Hamburger toggle ──
+      var hamburger = document.getElementById('hamburger');
+      var navLinks = document.getElementById('navLinks');
+      hamburger.addEventListener('click', function () {
+        navLinks.classList.toggle('open');
+      });
+
+      // ── Health check ──
+      var statusDot = document.getElementById('statusDot');
+      var statusText = document.getElementById('statusText');
+
+      function checkHealth() {
+        fetch('/health')
+          .then(function (res) {
+            if (res.ok) return res.json();
+            throw new Error('HTTP ' + res.status);
+          })
+          .then(function () {
+            statusDot.className = 'status-dot online';
+            statusText.textContent = 'Tous les systèmes sont opérationnels';
+          })
+          .catch(function (err) {
+            statusDot.className = 'status-dot offline';
+            statusText.textContent = err.message.startsWith('HTTP')
+              ? 'Service en erreur (' + err.message + ')'
+              : 'Service injoignable — vérifiez votre connexion';
+          });
+      }
+
+      checkHealth();
+      setInterval(checkHealth, 30000);
+
+      // ── Animated counters ──
+      var countersTriggered = false;
+      var statsObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !countersTriggered) {
+            countersTriggered = true;
+            animateCounters();
+            statsObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      var statsSection = document.querySelector('.stats-grid');
+      if (statsSection) statsObserver.observe(statsSection);
+
+      function animateCounters() {
+        var statValues = document.querySelectorAll('.stat-value[data-target]');
+        statValues.forEach(function (el) {
+          var target = parseFloat(el.getAttribute('data-target'));
+          var suffix = el.getAttribute('data-suffix') || '';
+          var prefix = el.getAttribute('data-prefix') || '';
+          var decimal = parseInt(el.getAttribute('data-decimal')) || 0;
+          var duration = 1500;
+          var startTime = null;
+
+          function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            var progress = Math.min((timestamp - startTime) / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            var current = (target * eased).toFixed(decimal);
+            el.textContent = prefix + current + suffix;
+            if (progress < 1) {
+              requestAnimationFrame(step);
+            }
+          }
+
+          requestAnimationFrame(step);
+        });
       }
     })();
   </script>
