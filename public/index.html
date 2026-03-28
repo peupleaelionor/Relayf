@@ -1123,15 +1123,12 @@
 
       // ── Navbar scroll detection ──
       var navbar = document.getElementById('navbar');
-      var lastScrollY = 0;
       window.addEventListener('scroll', function () {
-        var currentY = window.scrollY;
-        if (currentY > 40) {
+        if (window.scrollY > 40) {
           navbar.classList.add('scrolled');
         } else {
           navbar.classList.remove('scrolled');
         }
-        lastScrollY = currentY;
       }, { passive: true });
 
       // ── Hamburger toggle ──
@@ -1149,15 +1146,17 @@
         fetch('/health')
           .then(function (res) {
             if (res.ok) return res.json();
-            throw new Error('Not OK');
+            throw new Error('HTTP ' + res.status);
           })
           .then(function () {
             statusDot.className = 'status-dot online';
             statusText.textContent = 'Tous les systèmes sont opérationnels';
           })
-          .catch(function () {
+          .catch(function (err) {
             statusDot.className = 'status-dot offline';
-            statusText.textContent = 'Service temporairement indisponible';
+            statusText.textContent = err.message.startsWith('HTTP')
+              ? 'Service en erreur (' + err.message + ')'
+              : 'Service injoignable — vérifiez votre connexion';
           });
       }
 
